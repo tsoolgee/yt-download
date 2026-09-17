@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="he"><head><meta charset="utf-8"><title>דמה יוטיוב – בדיקת מוריד</title>
+<style>
+  body { margin:0; font:14px/1.5 "Noto Sans Hebrew",Arial,sans-serif; direction:rtl; background:#fff; color:#0f0f0f; }
+  .page { max-width:700px; margin:40px auto; padding:0 20px; }
+  .fake-player { aspect-ratio:16/9; background:#000; border-radius:12px; }
+  h1 { font-size:20px; }
+  #log { margin-top:20px; padding:12px; background:#f3f3f3; border-radius:8px; white-space:pre-wrap; font-family:Consolas,monospace; font-size:12px; }
+</style>
+</head><body>
+<div class="page">
+  <div class="fake-player"></div>
+  <h1>סרטון בדיקה</h1>
+  <p>דף דמה: מחליף את <code>/youtubei/v1/player</code> בפיקסצ'רים מקומיים, ושולח את הקובץ המוזג ל-<code>/save</code>.</p>
+  <div id="log">ממתין…</div>
+</div>
+<script>
+const log = m => { const el = document.getElementById('log'); el.textContent = (el.textContent === 'ממתין…' ? '' : el.textContent + '\n') + m; };
+window.__done = null;
+history.replaceState(null, '', '/test/index.html?v=jNQXAC9IVRw');
+if (new URLSearchParams(location.search).get('dark') === '1') document.documentElement.setAttribute('dark', '');
+
+const V = '/test/video.mp4', A = '/test/audio.m4a';
+const sizes = {};
+
+const realFetch = window.fetch.bind(window);
+
+// דמה של תשובת הנגן, עם אותם שדות שהקוד קורא
+function playerResponse() {
+  return {
+    playabilityStatus: { status: 'OK' },
+    videoDetails: { title: 'סרטון בדיקה – testsrc', author: 'בדיקה', lengthSeconds: '5' },
+    streamingData: { adaptiveFormats: [
+      { itag: 136, url: location.origin + V + '?itag=136', mimeType: 'video/mp4; codecs="avc1.4d401e"',
+        bitrate: 500000, width: 320, height: 240, fps: 15, qualityLabel: '240p', contentLength: String(sizes.v) },
+      { itag: 140, url: location.origin + A + '?itag=140', mimeType: 'audio/mp4; codecs="mp4a.40.2"',
+        bitrate: 64000, contentLength: String(sizes.a) },
+    ] },
+  };
+}
+
+window.fetch = async (input, init) => {
+  const url = typeof input === 'string' ? input : input.url;
+  if (url.includes('/youtubei/v1/player')) {
+    log('→ בקשת player יורטה');
+    return new Response(JSON.stringify(playerResponse()), { status: 200, headers: { 'content-type': 'application/json' } });
+  }
+  return realFetch(input, init);
+};
+
+// במקום להוריד לדיסק – שולחים את הקובץ לשרת כדי ש-ffprobe יבדוק אותו
+const realClick = HTMLAnchorElement.prototype.click;
+HTMLAnchorElement.prototype.click = function () {
+  if (!this.download || !this.href.startsWith('blob:')) return realClick.call(this);
+  log('→ נשמר קובץ: ' + this.download);
+  realFetch(this.href)
+    .then(r => r.blob())
+    .then(b => realFetch('/save?name=' + encodeURIComponent(this.download), { method: 'POST', body: b })
+      .then(() => { log('✔ הועלה לשרת: ' + b.size + ' בתים'); window.__done = { name: this.download, size: b.size }; }))
+    .catch(e => { log('✘ ' + e.message); window.__done = { error: String(e) }; });
+};
+
+(async () => {
+  const [v, a] = await Promise.all([realFetch(V), realFetch(A)]);
+  sizes.v = +v.headers.get('content-length');
+  sizes.a = +a.headers.get('content-length');
+  log('פיקסצ\'רים: וידאו ' + sizes.v + ' ב׳, אודיו ' + sizes.a + ' ב׳');
+  const s = document.createElement('script');
+  s.src = '/userscript/yt-download.user.js';
+  s.onload = () => log('הסקריפט נטען – הכפתור אמור להופיע בצד');
+  document.head.append(s);
+})();
+</script>
+</body></html>

@@ -1,0 +1,27 @@
+name: release
+
+# תג v* -> בונה מ-src/ ומצרף את ה-ZIP לשחרור.
+# כך הקישור releases/latest/download/yt-download.zip תמיד מצביע על האחרון.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: בנייה
+        run: python build.py
+      - name: שחרור
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/yt-download.zip
+          generate_release_notes: true
