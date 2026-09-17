@@ -2,5 +2,5 @@ __pycache__/
 dist/
 .claude/
 test/out/
-test/out.mp4
 test/out.m4a
+test/out-*.mp4
