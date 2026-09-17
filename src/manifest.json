@@ -4,18 +4,31 @@
   "short_name": "מוריד יוטיוב",
   "author": "צול גאה – TSOOLGEE.UK",
   "homepage_url": "https://tsoolgee.uk",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "הורדת סרטונים מיוטיוב לקובץ MP4 – הכול בתוך הדפדפן, בלי תוכנה ובלי שרת.",
   "minimum_chrome_version": "111",
-  "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
   "action": {
     "default_title": "מוריד יוטיוב – הכפתור נמצא מתחת לסרטון",
-    "default_icon": { "16": "icons/16.png", "48": "icons/48.png" }
+    "default_icon": {
+      "16": "icons/16.png",
+      "48": "icons/48.png"
+    }
   },
   "content_scripts": [
     {
-      "matches": ["*://www.youtube.com/*", "*://m.youtube.com/*", "*://music.youtube.com/*"],
-      "js": ["content.js"],
+      "matches": [
+        "*://www.youtube.com/*",
+        "*://m.youtube.com/*",
+        "*://music.youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_start",
       "world": "MAIN"
     }
