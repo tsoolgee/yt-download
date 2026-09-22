@@ -61,6 +61,13 @@ html[dark] .ytdl-fab, [dark] .ytdl-fab { background: #f1f1f1; color: #0f0f0f; }
 }
 .ytdl-toast b { display: block; font-weight: 500; margin-bottom: 2px; }
 .ytdl-toast span { opacity: .7; font-size: 13px; }
+
+/* מסך מלא: יוטיוב מבקש fullscreen על <html> עצמו, אז כל מה שב-body נשאר גלוי.
+   כל סלקטור בכלל נפרד – סלקטור לא מוכר מבטל את כל הרשימה שלו. */
+html:fullscreen :is(.ytdl-fab, .ytdl-menu, .ytdl-toast) { display: none !important; }
+html:-webkit-full-screen :is(.ytdl-fab, .ytdl-menu, .ytdl-toast) { display: none !important; }
+html:has(:fullscreen) :is(.ytdl-fab, .ytdl-menu, .ytdl-toast) { display: none !important; }
+html:has(ytd-watch-flexy[fullscreen], .html5-video-player.ytp-fullscreen) :is(.ytdl-fab, .ytdl-menu, .ytdl-toast) { display: none !important; }
 `;
 
 function injectCss() {

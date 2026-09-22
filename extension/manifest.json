@@ -4,7 +4,7 @@
   "short_name": "מוריד יוטיוב",
   "author": "צול גאה – TSOOLGEE.UK",
   "homepage_url": "https://tsoolgee.uk",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "הורדת סרטונים מיוטיוב לקובץ MP4 – הכול בתוך הדפדפן, בלי תוכנה ובלי שרת.",
   "minimum_chrome_version": "111",
   "icons": {

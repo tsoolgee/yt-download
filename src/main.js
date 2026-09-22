@@ -152,6 +152,8 @@ function boot() {
   mount();
   // יוטיוב הוא SPA: גם ניווט וגם בנייה מחדש של ה-body
   new MutationObserver(() => mount()).observe(document.documentElement, { childList: true, subtree: true });
+  // תפריט פתוח לא נשאר תלוי כשנכנסים למסך מלא או יוצאים ממנו
+  for (const ev of ['fullscreenchange', 'webkitfullscreenchange']) document.addEventListener(ev, closeMenu);
   for (const ev of ['yt-navigate-finish', 'yt-page-data-updated', 'state-navigatefinish']) {
     addEventListener(ev, () => { closeMenu(); setTimeout(mount, 0); }, true);
   }
